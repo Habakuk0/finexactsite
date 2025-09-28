@@ -1,0 +1,10 @@
+# robots.txt for https://finexactsolutions.co.ke
+
+User-agent: *
+Allow: /
+
+# Optional but recommended
+Sitemap: https://finexactsolutions.co.ke/sitemap.xml
+
+# (Optional) If you ever need to block specific folders, add lines like:
+# Disallow: /private/
