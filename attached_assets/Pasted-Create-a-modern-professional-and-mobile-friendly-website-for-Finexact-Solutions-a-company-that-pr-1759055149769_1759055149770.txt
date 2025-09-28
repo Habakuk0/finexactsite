@@ -1,0 +1,68 @@
+Create a modern, professional, and mobile-friendly website for Finexact Solutions, a company that provides bookkeeping services, tax solutions, and accounting software solutions.
+
+Business Details
+
+Name: Finexact Solutions
+
+Tagline: Your Partner in Accurate Books & Smart Accounting
+
+Email: info@finexactsolutions.co.ke
+
+Services:
+
+Professional Bookkeeping – Monthly bookkeeping, financial statements, bank reconciliations, payroll support, and tax-ready reports.
+
+Tax Services –
+
+VAT Services (registration, filing, and compliance)
+
+Income Tax Services (corporate and individual filing, compliance)
+
+Tax Audit Solutions (KRA audit support and representation)
+
+Accounting Software Solutions –
+
+QuickBooks & Xero installation and setup
+
+Chart of accounts creation and customization
+
+Software training and support
+
+Data migration and troubleshooting
+
+Website Requirements
+
+Home Page
+
+Hero section with a clean, professional finance/business image and the tagline.
+
+Call-to-action button: “Request a Free Consultation” linking to the contact page.
+
+Short overview of the three main service areas (Bookkeeping, Tax Solutions, Software Solutions).
+
+Key benefits section (e.g., Reliable & Accurate, Certified Professionals, Customized Accounting Solutions).
+
+Services Page
+
+Bookkeeping Services: Clear explanation of monthly accounts, reconciliations, financial statements, and tax compliance.
+
+Tax Services: Details of VAT services, income tax filing, and tax audit solutions.
+
+Accounting Software Solutions: QuickBooks & Xero installation, chart of accounts creation, training, and customization.
+
+Include a Request a Quote button for inquiries.
+
+About Us Page
+
+A short description of what Finexact Solutions does (no team bios or photos).
+
+Example text: “Finexact Solutions provides professional bookkeeping, tax services, and customized accounting software solutions to help businesses stay financially organized, compliant, and efficient.”
+
+Contact Page
+
+Contact form with fields: Name, Email, Phone, Business Name, Service Needed, Message.
+
+Display email address: info@finexactsolutions.co.ke
+ clearly for direct communication.
+
+Optional Google Maps embed if a physical office location is available.
