@@ -2,6 +2,7 @@ import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import Logo from "./Logo";
 
 export default function Navigation() {
   const [location] = useLocation();
@@ -11,6 +12,7 @@ export default function Navigation() {
     { name: "Home", href: "/" },
     { name: "Services", href: "/services" },
     { name: "About", href: "/about" },
+    { name: "Resources", href: "/resources" },
     { name: "Contact", href: "/contact" },
   ];
 
@@ -19,7 +21,8 @@ export default function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link href="/" className="flex-shrink-0">
+          <Link href="/" className="flex-shrink-0 flex items-center gap-3">
+            <Logo size="md" />
             <div className="text-2xl font-bold text-primary">
               Finexact Solutions
             </div>

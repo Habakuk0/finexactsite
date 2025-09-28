@@ -1,4 +1,5 @@
 import { Link } from "wouter";
+import Logo from "./Logo";
 
 export default function Footer() {
   return (
@@ -7,8 +8,11 @@ export default function Footer() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Company Info */}
           <div className="lg:col-span-2">
-            <div className="text-2xl font-bold text-primary mb-4">
-              Finexact Solutions
+            <div className="flex items-center gap-3 mb-4">
+              <Logo size="md" />
+              <div className="text-2xl font-bold text-primary">
+                Finexact Solutions
+              </div>
             </div>
             <p className="text-muted-foreground mb-4 max-w-md">
               Your Partner in Accurate Books & Smart Accounting. Professional bookkeeping, 
@@ -36,6 +40,11 @@ export default function Footer() {
               <li>
                 <Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">
                   About Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/resources" className="text-muted-foreground hover:text-primary transition-colors">
+                  Resources
                 </Link>
               </li>
               <li>
