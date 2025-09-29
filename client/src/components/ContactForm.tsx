@@ -56,14 +56,18 @@ export default function ContactForm() {
                   <Mail className="w-5 h-5 text-primary" />
                   <div>
                     <p className="text-sm font-medium">Email</p>
-                    <p className="text-sm text-muted-foreground">info@finexactsolutions.co.ke</p>
+                    <p className="text-sm text-muted-foreground">
+                      <a href="mailto:info@finexactsolutions.co.ke" className="hover:underline">
+                        info@finexactsolutions.co.ke
+                      </a>
+                    </p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
                   <Phone className="w-5 h-5 text-primary" />
                   <div>
                     <p className="text-sm font-medium">Phone</p>
-                    <p className="text-sm text-muted-foreground">Available upon request</p>
+                    <p className="text-sm text-muted-foreground">+254 751 151 841</p>
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
