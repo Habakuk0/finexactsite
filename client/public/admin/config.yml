@@ -2,8 +2,6 @@ backend:
   name: github
   repo: Habakuk0/finexactsite   # your GitHub repo
   branch: main                  # branch for content
-  base_url: https://api.netlify.com
-  auth_endpoint: /.netlify/identity
 
 site_url: https://www.finexactsolutions.co.ke
 
