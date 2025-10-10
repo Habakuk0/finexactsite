@@ -1,219 +1,97 @@
-import Navigation from "@/components/Navigation";
-import Footer from "@/components/Footer";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Calendar, Clock, ArrowRight } from "lucide-react";
-import { Link } from "wouter";
+import React, { useState, FormEvent } from "react";
 
-// TODO: Replace with actual data from backend/CMS
-const articles = [
-  {
-    id: "1",
-    title: "Understanding VAT Registration Requirements in Kenya",
-    description: "A comprehensive guide to VAT registration requirements, thresholds, and compliance obligations for businesses in Kenya.",
-    content: "Learn about the current VAT registration thresholds, required documentation, and step-by-step process for registering your business with KRA...",
-    category: "Tax Compliance",
-    publishDate: "2024-03-15",
-    readTime: "8 min read",
-    featured: true
-  },
-  {
-    id: "2", 
-    title: "QuickBooks vs Xero: Which Accounting Software is Right for Your Business?",
-    description: "Compare features, pricing, and capabilities of QuickBooks and Xero to make an informed decision for your business accounting needs.",
-    content: "Choosing the right accounting software is crucial for efficient financial management. This comparison covers key features, user experience, and pricing...",
-    category: "Software Solutions",
-    publishDate: "2024-03-10",
-    readTime: "12 min read",
-    featured: false
-  },
-  {
-    id: "3",
-    title: "Monthly Bookkeeping Checklist for Small Businesses",
-    description: "Essential tasks every small business should complete monthly to maintain accurate financial records and ensure compliance.",
-    content: "Stay on top of your business finances with this comprehensive monthly checklist covering bank reconciliation, expense tracking, and financial reporting...",
-    category: "Bookkeeping",
-    publishDate: "2024-03-05",
-    readTime: "6 min read",
-    featured: false
-  },
-  {
-    id: "4",
-    title: "How to Prepare for a KRA Tax Audit",
-    description: "Steps to take when facing a KRA audit, required documentation, and how to ensure a smooth audit process.",
-    content: "Being prepared for a KRA audit can save time and reduce stress. Learn what documents to keep ready and how to respond to audit requests...",
-    category: "Tax Compliance",
-    publishDate: "2024-02-28",
-    readTime: "10 min read",
-    featured: true
-  }
-];
+const ResourcesPage: React.FC = () => {
+  const [submitted, setSubmitted] = useState(false);
 
-const categories = ["All", "Tax Compliance", "Bookkeeping", "Software Solutions"];
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
 
-export default function Resources() {
+    try {
+      const formData = new FormData(form);
+      await fetch("/", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: new URLSearchParams(formData as any).toString(),
+      });
+      setSubmitted(true);
+      form.reset();
+    } catch (error) {
+      alert("Something went wrong. Please try again later.");
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation />
-      
-      <main>
-        {/* Header Section */}
-        <section className="py-16 lg:py-24 bg-gradient-to-br from-primary/5 to-primary/10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-4xl lg:text-5xl font-bold text-foreground mb-6">
-              Resources & Insights
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-              Stay informed with our latest articles on accounting best practices, 
-              tax compliance, and financial management tips for businesses.
-            </p>
-          </div>
-        </section>
+    <div className="resources-page bg-gray-50 text-gray-800">
+      {/* Header Section */}
+      <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-20 text-center">
+        <h1 className="text-4xl font-bold mb-4">Resources</h1>
+        <p className="text-lg">
+          Explore our latest insights, updates, and expert tips on finance, accounting, and business growth.
+        </p>
+      </section>
 
-        {/* Featured Article */}
-        <section className="py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {articles.filter(article => article.featured)[0] && (
-              <div className="mb-12">
-                <h2 className="text-2xl font-bold text-foreground mb-6">Featured Article</h2>
-                <Card className="hover-elevate transition-all duration-300">
-                  <CardHeader>
-                    <div className="flex items-center gap-2 mb-2">
-                      <Badge variant="secondary" data-testid="badge-featured-category">
-                        {articles[0].category}
-                      </Badge>
-                      <span className="text-sm text-muted-foreground">Featured</span>
-                    </div>
-                    <CardTitle className="text-2xl mb-2">{articles[0].title}</CardTitle>
-                    <CardDescription className="text-base">
-                      {articles[0].description}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        <span>{new Date(articles[0].publishDate).toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
-                        <span>{articles[0].readTime}</span>
-                      </div>
-                    </div>
-                    <p className="text-muted-foreground mb-4 leading-relaxed">
-                      {articles[0].content}
-                    </p>
-                    <Button asChild data-testid="button-read-featured">
-                      <Link href={`/resources/${articles[0].id}`}>
-                        Read Full Article <ArrowRight className="w-4 h-4 ml-2" />
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-          </div>
-        </section>
+      {/* Content Section */}
+      <section className="max-w-6xl mx-auto py-16 px-6">
+        <h2 className="text-3xl font-semibold mb-8 text-center">Latest Posts</h2>
+        {/* Decap CMS posts will render here */}
+        <div id="blog-posts" className="grid gap-8 md:grid-cols-3">
+          {/* CMS dynamically injects posts */}
+        </div>
+      </section>
 
-        {/* Articles Grid */}
-        <section className="py-12 bg-muted/20">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
-              <h2 className="text-2xl font-bold text-foreground mb-4 md:mb-0">
-                Latest Articles
-              </h2>
-              
-              {/* Category Filter */}
-              <div className="flex flex-wrap gap-2">
-                {categories.map((category) => (
-                  <Button
-                    key={category}
-                    variant="outline"
-                    size="sm"
-                    className="hover-elevate"
-                    data-testid={`button-filter-${category.toLowerCase().replace(" ", "-")}`}
-                    onClick={() => console.log(`Filter by: ${category}`)}
-                  >
-                    {category}
-                  </Button>
-                ))}
-              </div>
-            </div>
+      {/* Stay Updated Section */}
+      <section className="bg-indigo-700 text-white py-16 text-center">
+        <h2 className="text-3xl font-semibold mb-4">Stay Updated</h2>
+        <p className="text-lg mb-8">
+          Enter your email below to get notified whenever we publish new content.
+        </p>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {articles.filter(article => !article.featured).map((article) => (
-                <Card 
-                  key={article.id} 
-                  className="hover-elevate transition-all duration-300 h-full flex flex-col"
-                  data-testid={`card-article-${article.id}`}
-                >
-                  <CardHeader className="flex-grow">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Badge variant="secondary" data-testid={`badge-category-${article.id}`}>
-                        {article.category}
-                      </Badge>
-                    </div>
-                    <CardTitle className="text-lg leading-tight mb-2">
-                      {article.title}
-                    </CardTitle>
-                    <CardDescription>
-                      {article.description}
-                    </CardDescription>
-                  </CardHeader>
-                  
-                  <CardContent className="pt-0">
-                    <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        <span>{new Date(article.publishDate).toLocaleDateString()}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
-                        <span>{article.readTime}</span>
-                      </div>
-                    </div>
-                    
-                    <Button 
-                      asChild 
-                      variant="outline" 
-                      className="w-full"
-                      data-testid={`button-read-${article.id}`}
-                    >
-                      <Link href={`/resources/${article.id}`}>
-                        Read Article <ArrowRight className="w-4 h-4 ml-2" />
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Newsletter CTA */}
-        <section className="py-16 lg:py-24">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-3xl lg:text-4xl font-bold text-foreground mb-6">
+        {!submitted ? (
+          <form
+            name="subscribe"
+            method="POST"
+            data-netlify="true"
+            onSubmit={handleSubmit}
+            className="flex flex-col sm:flex-row justify-center items-center gap-4 max-w-md mx-auto"
+          >
+            <input type="hidden" name="form-name" value="subscribe" />
+            <input
+              type="email"
+              name="email"
+              placeholder="Enter your email address"
+              required
+              className="w-full px-4 py-3 rounded-md text-gray-900 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+            />
+            <button
+              type="submit"
+              className="bg-yellow-400 text-gray-900 font-semibold px-6 py-3 rounded-md hover:bg-yellow-300 transition duration-300"
+            >
               Stay Updated
-            </h2>
-            <p className="text-xl text-muted-foreground mb-8">
-              Get the latest accounting tips, tax updates, and business insights 
-              delivered directly to your inbox.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button asChild size="lg" data-testid="button-resources-contact">
-                <Link href="/contact">Subscribe to Updates</Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" data-testid="button-resources-consultation">
-                <Link href="/contact">Schedule Consultation</Link>
-              </Button>
-            </div>
+            </button>
+          </form>
+        ) : (
+          <div className="text-center text-lg font-medium mt-6">
+            ✅ Thank you! You’ll now receive updates from FinExact Solutions.
           </div>
-        </section>
-      </main>
+        )}
+      </section>
 
-      <Footer />
+      {/* Consultation Section */}
+      <section className="bg-white py-20 text-center">
+        <h2 className="text-3xl font-semibold mb-6">Schedule a Consultation</h2>
+        <p className="text-lg mb-8">
+          Ready to take your business finances to the next level? Let’s talk.
+        </p>
+        <a
+          href="/contact"
+          className="inline-block bg-blue-600 text-white font-semibold px-8 py-3 rounded-md hover:bg-blue-700 transition duration-300"
+        >
+          Schedule Consultation
+        </a>
+      </section>
     </div>
   );
-}
+};
+
+export default ResourcesPage;
