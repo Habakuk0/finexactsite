@@ -1,20 +1,26 @@
 backend:
-  name: github
-  repo: Habakuk0/finexactSite   # your repo
-  branch: main                 # branch to commit to
-  base_url: https://api.github.com
+  name: git-gateway
+  branch: main
 
-media_folder: "client/public/uploads"
-public_folder: "/uploads"
+site_url: https://www.finexactsolutions.co.ke
+
+media_folder: "client/src/assets/uploads"
+public_folder: "/src/assets/uploads"
+
+publish_mode: editorial_workflow
 
 collections:
   - name: "resources"
     label: "Resources"
-    folder: "client/content/resources"
+    folder: "client/src/content/resources"
     create: true
     slug: "{{slug}}"
+    preview_path: "resources/{{slug}}"
     fields:
-      - { name: "title", label: "Title", widget: "string" }
-      - { name: "date", label: "Date", widget: "datetime" }
-      - { name: "body", label: "Body", widget: "markdown" }
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Slug", name: "slug", widget: "string", default: "{{title | slug}}" }
+      - { label: "Date", name: "date", widget: "datetime" }
+      - { label: "Description", name: "description", widget: "text" }
+      - { label: "Image", name: "image", widget: "image" }
+      - { label: "Body", name: "body", widget: "markdown" }
 
