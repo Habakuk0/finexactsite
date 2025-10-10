@@ -1,6 +1,6 @@
 import React, { useEffect, useState, FormEvent } from "react";
-import Layout from "@/components/Layout"; // adjust if your layout is in a different folder
 import matter from "gray-matter";
+import Navigation from "@/components/Navigation"; // ✅ Use your existing navbar
 
 interface Post {
   title: string;
@@ -14,11 +14,15 @@ const ResourcesPage: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [submitted, setSubmitted] = useState(false);
 
-  // 🔹 Load all Markdown files from client/content/resources
+  // 🔹 Load all Markdown files from the correct folder
   useEffect(() => {
     const loadPosts = async () => {
       try {
-        const files = import.meta.glob("/client/content/resources/*.md", { as: "raw" });
+        // ✅ Correct relative glob path (since Vite uses /src as root)
+        const files = import.meta.glob("/src/content/resources/*.md", {
+          query: "?raw",
+          import: "default",
+        });
         const loadedPosts: Post[] = [];
 
         for (const [path, fileLoader] of Object.entries(files)) {
@@ -35,7 +39,9 @@ const ResourcesPage: React.FC = () => {
         }
 
         // Sort by date (newest first)
-        loadedPosts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+        loadedPosts.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
         setPosts(loadedPosts);
       } catch (err) {
         console.error("Error loading markdown posts:", err);
@@ -45,7 +51,7 @@ const ResourcesPage: React.FC = () => {
     loadPosts();
   }, []);
 
-  // 🔹 Handle subscription form submission (Netlify)
+  // 🔹 Handle subscription form (Netlify)
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -65,21 +71,28 @@ const ResourcesPage: React.FC = () => {
   };
 
   return (
-    <Layout>
+    <>
+      <Navigation /> {/* ✅ Adds your site menu */}
+
       <div className="resources-page bg-gray-50 text-gray-800">
         {/* Header */}
         <section className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-20 text-center">
           <h1 className="text-4xl font-bold mb-4">Resources</h1>
           <p className="text-lg">
-            Explore our latest insights, updates, and expert tips on finance, accounting, and business growth.
+            Explore our latest insights, updates, and expert tips on finance,
+            accounting, and business growth.
           </p>
         </section>
 
         {/* Posts Section */}
         <section className="max-w-6xl mx-auto py-16 px-6">
-          <h2 className="text-3xl font-semibold mb-8 text-center">Latest Posts</h2>
+          <h2 className="text-3xl font-semibold mb-8 text-center">
+            Latest Posts
+          </h2>
           {posts.length === 0 ? (
-            <p className="text-center text-gray-600">No posts available yet.</p>
+            <p className="text-center text-gray-600">
+              No posts available yet.
+            </p>
           ) : (
             <div className="grid gap-8 md:grid-cols-3">
               {posts.map((post, index) => (
@@ -95,11 +108,15 @@ const ResourcesPage: React.FC = () => {
                     />
                   )}
                   <div className="p-6">
-                    <h3 className="text-2xl font-semibold mb-2">{post.title}</h3>
+                    <h3 className="text-2xl font-semibold mb-2">
+                      {post.title}
+                    </h3>
                     <p className="text-gray-500 text-sm mb-4">
                       {new Date(post.date).toLocaleDateString()}
                     </p>
-                    <p className="text-gray-700 mb-4 line-clamp-3">{post.summary}</p>
+                    <p className="text-gray-700 mb-4 line-clamp-3">
+                      {post.summary}
+                    </p>
                     <a
                       href={`/resources/${post.slug}`}
                       className="text-blue-600 font-medium hover:underline"
@@ -117,7 +134,8 @@ const ResourcesPage: React.FC = () => {
         <section className="bg-indigo-700 text-white py-16 text-center">
           <h2 className="text-3xl font-semibold mb-4">Stay Updated</h2>
           <p className="text-lg mb-8">
-            Enter your email below to get notified whenever we publish new content.
+            Enter your email below to get notified whenever we publish new
+            content.
           </p>
 
           {!submitted ? (
@@ -152,7 +170,9 @@ const ResourcesPage: React.FC = () => {
 
         {/* Consultation Section */}
         <section className="bg-white py-20 text-center">
-          <h2 className="text-3xl font-semibold mb-6">Schedule a Consultation</h2>
+          <h2 className="text-3xl font-semibold mb-6">
+            Schedule a Consultation
+          </h2>
           <p className="text-lg mb-8">
             Ready to take your business finances to the next level? Let’s talk.
           </p>
@@ -164,7 +184,7 @@ const ResourcesPage: React.FC = () => {
           </a>
         </section>
       </div>
-    </Layout>
+    </>
   );
 };
 
