@@ -7,6 +7,7 @@ import Home from "@/pages/Home";
 import Services from "@/pages/Services";
 import About from "@/pages/About";
 import Resources from "@/pages/Resources";
+import ResourcePage from "@/pages/ResourcePage";
 import Contact from "@/pages/Contact";
 import NotFound from "@/pages/not-found";
 
