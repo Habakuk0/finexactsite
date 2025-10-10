@@ -1,5 +1,5 @@
 import React, { useEffect, useState, FormEvent } from "react";
-import matter from "gray-matter";
+import fm from "front-matter";
 import Navigation from "@/components/Navigation"; // ✅ Use your existing navbar
 
 interface Post {
@@ -27,7 +27,7 @@ const ResourcesPage: React.FC = () => {
 
         for (const [path, fileLoader] of Object.entries(files)) {
           const rawContent = await fileLoader();
-          const { data } = matter(rawContent);
+          const { attributes: data, body } = fm(rawContent);
           const slug = path.split("/").pop()?.replace(".md", "") || "";
           loadedPosts.push({
             title: data.title || slug,
