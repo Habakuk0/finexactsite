@@ -1,0 +1,20 @@
+backend:
+  name: github
+  repo: Habakuk0/finexactSite   # your repo
+  branch: main                 # branch to commit to
+  base_url: https://api.github.com
+
+media_folder: "client/public/uploads"
+public_folder: "/uploads"
+
+collections:
+  - name: "resources"
+    label: "Resources"
+    folder: "client/content/resources"
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { name: "title", label: "Title", widget: "string" }
+      - { name: "date", label: "Date", widget: "datetime" }
+      - { name: "body", label: "Body", widget: "markdown" }
+
