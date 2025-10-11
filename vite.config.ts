@@ -7,7 +7,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+  ],
   root: path.resolve(__dirname, "client"),
   resolve: {
     alias: {
@@ -20,18 +22,20 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       external: [
-        'fs', 'path', 'os', 'http', 'https', 'url', 'stream', 'util',
+        // Node.js built-in modules
+        'fs', 'path', 'os', 'http', 'https', 'url', 'stream', 'util', 'child_process',
+        // Server dependencies that might get imported accidentally
         'express', 'ws', 'passport', 'express-session', 'connect-pg-simple',
-        'memorystore', 'drizzle-orm', '@neondatabase/serverless'
+        'memorystore', 'drizzle-orm', '@neondatabase/serverless',
+        'gray-matter' // This was causing your require error
       ],
     },
   },
   define: {
-    global: 'globalThis',
-    // Proper Buffer polyfill without require
-    'window.Buffer': 'Buffer',
+    global: 'globalThis', // Fix global object for browser
   },
   optimizeDeps: {
-    include: ['buffer'], // Let Vite handle Buffer properly
+    // Exclude problematic dependencies from pre-bundling
+    exclude: ['gray-matter', 'front-matter']
   },
 });

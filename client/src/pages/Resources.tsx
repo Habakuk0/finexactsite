@@ -1,7 +1,7 @@
 import React, { useEffect, useState, FormEvent } from "react";
 import fm from "front-matter";
-import { marked } from "marked";
-import Navigation from "@/components/Navigation"; // ✅ Use your existing navbar
+import { Link } from "wouter";
+import Navigation from "@/components/Navigation";
 
 interface Post {
   title: string;
@@ -12,14 +12,14 @@ interface Post {
 }
 
 const ResourcesPage: React.FC = () => {
+  // ✅ ADD THIS MISSING STATE DECLARATION
   const [posts, setPosts] = useState<Post[]>([]);
   const [submitted, setSubmitted] = useState(false);
 
-  // 🔹 Load all Markdown files from the correct folder
+  // ✅ ADD THIS MISSING useEffect HOOK
   useEffect(() => {
     const loadPosts = async () => {
       try {
-        // ✅ Correct relative glob path (since Vite uses /src as root)
         const files = import.meta.glob("/src/content/resources/*.md", {
           query: "?raw",
           import: "default",
@@ -39,7 +39,6 @@ const ResourcesPage: React.FC = () => {
           });
         }
 
-        // Sort by date (newest first)
         loadedPosts.sort(
           (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
         );
@@ -52,7 +51,7 @@ const ResourcesPage: React.FC = () => {
     loadPosts();
   }, []);
 
-  // 🔹 Handle subscription form (Netlify)
+  // ✅ ADD THIS MISSING FORM HANDLER
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const form = e.currentTarget;
@@ -73,7 +72,7 @@ const ResourcesPage: React.FC = () => {
 
   return (
     <>
-      <Navigation /> {/* ✅ Adds your site menu */}
+      <Navigation />
 
       <div className="resources-page bg-gray-50 text-gray-800">
         {/* Header */}
@@ -118,12 +117,12 @@ const ResourcesPage: React.FC = () => {
                     <p className="text-gray-700 mb-4 line-clamp-3">
                       {post.summary}
                     </p>
-                    <a
+                    <Link
                       href={`/resources/${post.slug}`}
                       className="text-blue-600 font-medium hover:underline"
                     >
                       Read more →
-                    </a>
+                    </Link>
                   </div>
                 </div>
               ))}
@@ -164,7 +163,7 @@ const ResourcesPage: React.FC = () => {
             </form>
           ) : (
             <div className="text-center text-lg font-medium mt-6">
-              ✅ Thank you! You’ll now receive updates from FinExact Solutions.
+              ✅ Thank you! You'll now receive updates from FinExact Solutions.
             </div>
           )}
         </section>
@@ -175,14 +174,14 @@ const ResourcesPage: React.FC = () => {
             Schedule a Consultation
           </h2>
           <p className="text-lg mb-8">
-            Ready to take your business finances to the next level? Let’s talk.
+            Ready to take your business finances to the next level? Let's talk.
           </p>
-          <a
+          <Link
             href="/contact"
             className="inline-block bg-blue-600 text-white font-semibold px-8 py-3 rounded-md hover:bg-blue-700 transition duration-300"
           >
             Schedule Consultation
-          </a>
+          </Link>
         </section>
       </div>
     </>

@@ -1,7 +1,7 @@
 backend:
   name: github
-  repo: Habakuk0/finexactsite   # your GitHub repo
-  branch: main                  # branch for content
+  repo: Habakuk0/finexactsite
+  branch: main
 
 site_url: https://www.finexactsolutions.co.ke
 
@@ -16,7 +16,8 @@ collections:
     folder: "client/src/content/resources"
     create: true
     slug: "{{slug}}"
-    preview_path: "resources/{{slug}}"
+    # Remove or comment out preview_path to disable "View Live"
+    # preview_path: "resources/{{slug}}"
     fields:
       - { label: "Title", name: "title", widget: "string" }
       - { label: "Slug", name: "slug", widget: "string", default: "{{title | slug}}" }
@@ -24,4 +25,3 @@ collections:
       - { label: "Description", name: "description", widget: "text" }
       - { label: "Image", name: "image", widget: "image" }
       - { label: "Body", name: "body", widget: "markdown" }
-
