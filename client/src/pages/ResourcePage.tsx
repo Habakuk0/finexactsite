@@ -4,21 +4,33 @@ import Navigation from "@/components/Navigation";
 
 export default function ResourcePage() {
   const { slug } = useParams();
+  
+  console.log('🔍 ResourcePage Debug:');
+  console.log(' - Looking for slug:', slug);
+  console.log(' - Available resources:', resources);
+  console.log(' - Available slugs:', resources.map(r => r.slug));
+  
   const resource = resources.find((r) => r.slug === slug);
 
-  if (!resource) return (
-    <div>
-      <Navigation />
-      <div className="max-w-4xl mx-auto p-8 text-center">
-        <h2 className="text-2xl font-bold text-gray-800">404 - Resource Not Found</h2>
-        <p className="text-gray-600 mt-4">The resource you're looking for doesn't exist.</p>
-        <a href="/resources" className="text-blue-600 hover:underline mt-4 inline-block">
-          ← Back to Resources
-        </a>
+  if (!resource) {
+    console.log('❌ Resource not found for slug:', slug);
+    return (
+      <div>
+        <Navigation />
+        <div className="max-w-4xl mx-auto p-8 text-center">
+          <h2 className="text-2xl font-bold text-gray-800">404 - Resource Not Found</h2>
+          <p className="text-gray-600 mt-4">Slug: "{slug}"</p>
+          <p className="text-gray-600">Available: {resources.map(r => r.slug).join(', ') || 'None'}</p>
+          <a href="/resources" className="text-blue-600 hover:underline mt-4 inline-block">
+            ← Back to Resources
+          </a>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
 
+  console.log('✅ Found resource:', resource.title);
+  
   return (
     <div>
       <Navigation />
