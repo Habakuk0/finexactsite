@@ -1,5 +1,6 @@
 import React, { useEffect, useState, FormEvent } from "react";
 import fm from "front-matter";
+import { marked } from "marked";
 import Navigation from "@/components/Navigation"; // ✅ Use your existing navbar
 
 interface Post {
