@@ -30,45 +30,30 @@ export default function ContactForm() {
     setSubmitStatus("idle");
 
     try {
-      // Create a hidden form and submit it
-      const form = document.createElement('form');
-      form.method = 'POST';
-      form.action = '/';
-      form.style.display = 'none';
+      // Method 1: Use FormData with proper encoding
+      const formDataToSend = new FormData();
+      formDataToSend.append('form-name', 'contact');
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('phone', formData.phone);
+      formDataToSend.append('businessName', formData.businessName);
+      formDataToSend.append('serviceNeeded', formData.serviceNeeded);
+      formDataToSend.append('message', formData.message);
 
-      // Add all form fields
-      const fields = [
-        { name: 'form-name', value: 'contact' },
-        { name: 'name', value: formData.name },
-        { name: 'email', value: formData.email },
-        { name: 'phone', value: formData.phone },
-        { name: 'businessName', value: formData.businessName },
-        { name: 'serviceNeeded', value: formData.serviceNeeded },
-        { name: 'message', value: formData.message },
-      ];
+      console.log('Submitting form data:', Object.fromEntries(formDataToSend));
 
-      fields.forEach(({ name, value }) => {
-        const input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = name;
-        input.value = value;
-        form.appendChild(input);
+      const response = await fetch('/', {
+        method: 'POST',
+        body: formDataToSend,
+        headers: {
+          'Accept': 'application/json',
+        },
       });
 
-      // Add honeypot field
-      const honeypot = document.createElement('input');
-      honeypot.type = 'text';
-      honeypot.name = 'bot-field';
-      honeypot.style.display = 'none';
-      form.appendChild(honeypot);
+      console.log('Response status:', response.status);
 
-      document.body.appendChild(form);
-      form.submit();
-
-      // Assume success since we're redirecting
-      setTimeout(() => {
+      if (response.ok) {
         setSubmitStatus("success");
-        setIsSubmitting(false);
         // Reset form
         setFormData({
           name: "",
@@ -78,11 +63,13 @@ export default function ContactForm() {
           serviceNeeded: "",
           message: ""
         });
-      }, 1000);
-
+      } else {
+        throw new Error(`Form submission failed with status: ${response.status}`);
+      }
     } catch (error) {
       console.error("Form submission error:", error);
       setSubmitStatus("error");
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -102,6 +89,23 @@ export default function ContactForm() {
 
         <div className="flex justify-center">
           <div className="w-full max-w-4xl">
+            {/* Hidden HTML form for Netlify detection */}
+            <form
+              name="contact"
+              method="POST"
+              data-netlify="true"
+              netlify-honeypot="bot-field"
+              style={{ display: 'none' }}
+            >
+              <input type="hidden" name="form-name" value="contact" />
+              <input type="text" name="name" />
+              <input type="email" name="email" />
+              <input type="tel" name="phone" />
+              <input type="text" name="businessName" />
+              <input type="text" name="serviceNeeded" />
+              <textarea name="message"></textarea>
+            </form>
+
             {/* Status Messages */}
             {submitStatus === "success" && (
               <div className="mb-6 p-4 border border-green-200 bg-green-50 rounded-lg flex items-center space-x-3">
@@ -122,6 +126,9 @@ export default function ContactForm() {
                   <p className="font-medium text-red-800">Submission Failed</p>
                   <p className="text-sm text-red-700">
                     Sorry, there was an error sending your message. Please try again or contact us directly.
+                  </p>
+                  <p className="text-xs text-red-600 mt-1">
+                    Check browser console for details.
                   </p>
                 </div>
               </div>
@@ -177,12 +184,26 @@ export default function ContactForm() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form 
+                      onSubmit={handleSubmit} 
+                      className="space-y-6"
+                      data-netlify="true"
+                      netlify-honeypot="bot-field"
+                    >
+                      {/* Honeypot field */}
+                      <div style={{ display: 'none' }}>
+                        <label>
+                          Don't fill this out if you're human: 
+                          <input name="bot-field" />
+                        </label>
+                      </div>
+
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="name">Full Name *</Label>
                           <Input
                             id="name"
+                            name="name"
                             type="text"
                             value={formData.name}
                             onChange={(e) => handleInputChange("name", e.target.value)}
@@ -195,6 +216,7 @@ export default function ContactForm() {
                           <Label htmlFor="email">Email Address *</Label>
                           <Input
                             id="email"
+                            name="email"
                             type="email"
                             value={formData.email}
                             onChange={(e) => handleInputChange("email", e.target.value)}
@@ -210,6 +232,7 @@ export default function ContactForm() {
                           <Label htmlFor="phone">Phone Number</Label>
                           <Input
                             id="phone"
+                            name="phone"
                             type="tel"
                             value={formData.phone}
                             onChange={(e) => handleInputChange("phone", e.target.value)}
@@ -221,6 +244,7 @@ export default function ContactForm() {
                           <Label htmlFor="businessName">Business Name</Label>
                           <Input
                             id="businessName"
+                            name="businessName"
                             type="text"
                             value={formData.businessName}
                             onChange={(e) => handleInputChange("businessName", e.target.value)}
@@ -233,6 +257,7 @@ export default function ContactForm() {
                       <div className="space-y-2">
                         <Label htmlFor="serviceNeeded">Service Needed</Label>
                         <Select
+                          name="serviceNeeded"
                           value={formData.serviceNeeded}
                           onValueChange={(value) => handleInputChange("serviceNeeded", value)}
                           disabled={isSubmitting}
@@ -257,6 +282,7 @@ export default function ContactForm() {
                         <Label htmlFor="message">Message</Label>
                         <Textarea
                           id="message"
+                          name="message"
                           value={formData.message}
                           onChange={(e) => handleInputChange("message", e.target.value)}
                           rows={5}
