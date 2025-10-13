@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,76 +8,23 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Mail, Phone, MapPin, Loader2, CheckCircle, XCircle } from "lucide-react";
 
 export default function ContactForm() {
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    businessName: "",
-    serviceNeeded: "",
-    message: ""
-  });
-
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
-
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus("idle");
 
-    // Log form data for debugging
-    console.log("Form data:", formData);
-
-    try {
-      // Method 1: Standard Netlify form submission
-      const formDataToSend = new URLSearchParams();
-      formDataToSend.append("form-name", "contact");
-      formDataToSend.append("name", formData.name);
-      formDataToSend.append("email", formData.email);
-      formDataToSend.append("phone", formData.phone);
-      formDataToSend.append("businessName", formData.businessName);
-      formDataToSend.append("serviceNeeded", formData.serviceNeeded);
-      formDataToSend.append("message", formData.message);
-
-      console.log("Submitting form data:", Object.fromEntries(formDataToSend));
-
-      const response = await fetch("/", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/x-www-form-urlencoded",
-          "Accept": "application/json"
-        },
-        body: formDataToSend.toString()
-      });
-
-      console.log("Response status:", response.status);
-      console.log("Response ok:", response.ok);
-
-      if (response.ok) {
+    // Let the native HTML form handle submission
+    if (formRef.current) {
+      formRef.current.submit();
+      // Netlify will handle the redirect, so we'll assume success
+      setTimeout(() => {
         setSubmitStatus("success");
-        // Reset form
-        setFormData({
-          name: "",
-          email: "",
-          phone: "",
-          businessName: "",
-          serviceNeeded: "",
-          message: ""
-        });
-      } else {
-        const errorText = await response.text();
-        console.error("Server error:", errorText);
-        throw new Error(`Form submission failed: ${response.status}`);
-      }
-    } catch (error) {
-      console.error("Form submission error:", error);
-      setSubmitStatus("error");
-    } finally {
-      setIsSubmitting(false);
+        setIsSubmitting(false);
+      }, 1000);
     }
   };
 
@@ -96,14 +43,23 @@ export default function ContactForm() {
 
         <div className="flex justify-center">
           <div className="w-full max-w-4xl">
-            {/* Debug Info - Remove after testing */}
-            {process.env.NODE_ENV === 'development' && (
-              <div className="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <p className="text-sm text-yellow-800">
-                  <strong>Debug Mode:</strong> Check browser console for submission details
-                </p>
-              </div>
-            )}
+            {/* Hidden HTML form for Netlify */}
+            <form
+              ref={formRef}
+              name="contact"
+              method="POST"
+              data-netlify="true"
+              netlify-honeypot="bot-field"
+              style={{ display: 'none' }}
+            >
+              <input type="hidden" name="form-name" value="contact" />
+              <input type="text" name="name" />
+              <input type="email" name="email" />
+              <input type="tel" name="phone" />
+              <input type="text" name="businessName" />
+              <input type="text" name="serviceNeeded" />
+              <textarea name="message"></textarea>
+            </form>
 
             {/* Status Messages */}
             {submitStatus === "success" && (
@@ -125,9 +81,6 @@ export default function ContactForm() {
                   <p className="font-medium text-red-800">Submission Failed</p>
                   <p className="text-sm text-red-700">
                     Sorry, there was an error sending your message. Please try again or contact us directly.
-                  </p>
-                  <p className="text-xs text-red-600 mt-1">
-                    Technical details available in browser console.
                   </p>
                 </div>
               </div>
@@ -183,23 +136,7 @@ export default function ContactForm() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <form 
-                      onSubmit={handleSubmit} 
-                      className="space-y-6"
-                      name="contact"
-                      method="POST"
-                      data-netlify="true"
-                      data-netlify-honeypot="bot-field"
-                    >
-                      {/* Netlify Form Fields */}
-                      <input type="hidden" name="form-name" value="contact" />
-                      <div style={{ display: 'none' }}>
-                        <label>
-                          Don't fill this out if you're human: 
-                          <input name="bot-field" />
-                        </label>
-                      </div>
-
+                    <form onSubmit={handleSubmit} className="space-y-6">
                       <div className="grid md:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="name">Full Name *</Label>
@@ -207,8 +144,6 @@ export default function ContactForm() {
                             id="name"
                             name="name"
                             type="text"
-                            value={formData.name}
-                            onChange={(e) => handleInputChange("name", e.target.value)}
                             required
                             placeholder="Enter your full name"
                             disabled={isSubmitting}
@@ -220,8 +155,6 @@ export default function ContactForm() {
                             id="email"
                             name="email"
                             type="email"
-                            value={formData.email}
-                            onChange={(e) => handleInputChange("email", e.target.value)}
                             required
                             placeholder="Enter your email"
                             disabled={isSubmitting}
@@ -236,8 +169,6 @@ export default function ContactForm() {
                             id="phone"
                             name="phone"
                             type="tel"
-                            value={formData.phone}
-                            onChange={(e) => handleInputChange("phone", e.target.value)}
                             placeholder="Enter your phone number"
                             disabled={isSubmitting}
                           />
@@ -248,8 +179,6 @@ export default function ContactForm() {
                             id="businessName"
                             name="businessName"
                             type="text"
-                            value={formData.businessName}
-                            onChange={(e) => handleInputChange("businessName", e.target.value)}
                             placeholder="Enter your business name"
                             disabled={isSubmitting}
                           />
@@ -258,12 +187,7 @@ export default function ContactForm() {
 
                       <div className="space-y-2">
                         <Label htmlFor="serviceNeeded">Service Needed</Label>
-                        <Select
-                          name="serviceNeeded"
-                          value={formData.serviceNeeded}
-                          onValueChange={(value) => handleInputChange("serviceNeeded", value)}
-                          disabled={isSubmitting}
-                        >
+                        <Select name="serviceNeeded" disabled={isSubmitting}>
                           <SelectTrigger>
                             <SelectValue placeholder="Select a service" />
                           </SelectTrigger>
@@ -285,8 +209,6 @@ export default function ContactForm() {
                         <Textarea
                           id="message"
                           name="message"
-                          value={formData.message}
-                          onChange={(e) => handleInputChange("message", e.target.value)}
                           rows={5}
                           placeholder="Tell us about your specific needs and how we can help..."
                           disabled={isSubmitting}
