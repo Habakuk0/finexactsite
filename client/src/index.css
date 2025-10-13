@@ -327,3 +327,39 @@
     inset: -1px;
   }
 }
+
+/* Add this at the VERY END of your index.css file */
+
+@keyframes countUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0); 
+  }
+}
+
+.animate-count-up {
+  animation: countUp 0.8s ease-out forwards;
+}
+
+/* Geometric shapes for the theme */
+.clip-triangle {
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+
+.clip-triangle-bottom-right {
+  clip-path: polygon(100% 0%, 100% 100%, 0% 100%);
+}
+
+.geometric-bg {
+  background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent 400px),
+              radial-gradient(circle at bottom left, rgba(245, 158, 11, 0.1), transparent 400px);
+}
+
+/* Smooth scrolling for better user experience */
+html {
+  scroll-behavior: smooth;
+}
