@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,23 +8,82 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Mail, Phone, MapPin, Loader2, CheckCircle, XCircle } from "lucide-react";
 
 export default function ContactForm() {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    businessName: "",
+    serviceNeeded: "",
+    message: ""
+  });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
-  const formRef = useRef<HTMLFormElement>(null);
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitStatus("idle");
 
-    // Let the native HTML form handle submission
-    if (formRef.current) {
-      formRef.current.submit();
-      // Netlify will handle the redirect, so we'll assume success
+    try {
+      // Create a hidden form and submit it
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = '/';
+      form.style.display = 'none';
+
+      // Add all form fields
+      const fields = [
+        { name: 'form-name', value: 'contact' },
+        { name: 'name', value: formData.name },
+        { name: 'email', value: formData.email },
+        { name: 'phone', value: formData.phone },
+        { name: 'businessName', value: formData.businessName },
+        { name: 'serviceNeeded', value: formData.serviceNeeded },
+        { name: 'message', value: formData.message },
+      ];
+
+      fields.forEach(({ name, value }) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = name;
+        input.value = value;
+        form.appendChild(input);
+      });
+
+      // Add honeypot field
+      const honeypot = document.createElement('input');
+      honeypot.type = 'text';
+      honeypot.name = 'bot-field';
+      honeypot.style.display = 'none';
+      form.appendChild(honeypot);
+
+      document.body.appendChild(form);
+      form.submit();
+
+      // Assume success since we're redirecting
       setTimeout(() => {
         setSubmitStatus("success");
         setIsSubmitting(false);
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          businessName: "",
+          serviceNeeded: "",
+          message: ""
+        });
       }, 1000);
+
+    } catch (error) {
+      console.error("Form submission error:", error);
+      setSubmitStatus("error");
+      setIsSubmitting(false);
     }
   };
 
@@ -43,24 +102,6 @@ export default function ContactForm() {
 
         <div className="flex justify-center">
           <div className="w-full max-w-4xl">
-            {/* Hidden HTML form for Netlify */}
-            <form
-              ref={formRef}
-              name="contact"
-              method="POST"
-              data-netlify="true"
-              netlify-honeypot="bot-field"
-              style={{ display: 'none' }}
-            >
-              <input type="hidden" name="form-name" value="contact" />
-              <input type="text" name="name" />
-              <input type="email" name="email" />
-              <input type="tel" name="phone" />
-              <input type="text" name="businessName" />
-              <input type="text" name="serviceNeeded" />
-              <textarea name="message"></textarea>
-            </form>
-
             {/* Status Messages */}
             {submitStatus === "success" && (
               <div className="mb-6 p-4 border border-green-200 bg-green-50 rounded-lg flex items-center space-x-3">
@@ -142,8 +183,9 @@ export default function ContactForm() {
                           <Label htmlFor="name">Full Name *</Label>
                           <Input
                             id="name"
-                            name="name"
                             type="text"
+                            value={formData.name}
+                            onChange={(e) => handleInputChange("name", e.target.value)}
                             required
                             placeholder="Enter your full name"
                             disabled={isSubmitting}
@@ -153,8 +195,9 @@ export default function ContactForm() {
                           <Label htmlFor="email">Email Address *</Label>
                           <Input
                             id="email"
-                            name="email"
                             type="email"
+                            value={formData.email}
+                            onChange={(e) => handleInputChange("email", e.target.value)}
                             required
                             placeholder="Enter your email"
                             disabled={isSubmitting}
@@ -167,8 +210,9 @@ export default function ContactForm() {
                           <Label htmlFor="phone">Phone Number</Label>
                           <Input
                             id="phone"
-                            name="phone"
                             type="tel"
+                            value={formData.phone}
+                            onChange={(e) => handleInputChange("phone", e.target.value)}
                             placeholder="Enter your phone number"
                             disabled={isSubmitting}
                           />
@@ -177,8 +221,9 @@ export default function ContactForm() {
                           <Label htmlFor="businessName">Business Name</Label>
                           <Input
                             id="businessName"
-                            name="businessName"
                             type="text"
+                            value={formData.businessName}
+                            onChange={(e) => handleInputChange("businessName", e.target.value)}
                             placeholder="Enter your business name"
                             disabled={isSubmitting}
                           />
@@ -187,7 +232,11 @@ export default function ContactForm() {
 
                       <div className="space-y-2">
                         <Label htmlFor="serviceNeeded">Service Needed</Label>
-                        <Select name="serviceNeeded" disabled={isSubmitting}>
+                        <Select
+                          value={formData.serviceNeeded}
+                          onValueChange={(value) => handleInputChange("serviceNeeded", value)}
+                          disabled={isSubmitting}
+                        >
                           <SelectTrigger>
                             <SelectValue placeholder="Select a service" />
                           </SelectTrigger>
@@ -208,7 +257,8 @@ export default function ContactForm() {
                         <Label htmlFor="message">Message</Label>
                         <Textarea
                           id="message"
-                          name="message"
+                          value={formData.message}
+                          onChange={(e) => handleInputChange("message", e.target.value)}
                           rows={5}
                           placeholder="Tell us about your specific needs and how we can help..."
                           disabled={isSubmitting}
