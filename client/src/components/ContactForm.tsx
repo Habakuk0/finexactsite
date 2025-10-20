@@ -1,22 +1,24 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2, CheckCircle, XCircle } from "lucide-react";
+import { Loader2, CheckCircle, XCircle, Mail, Phone } from "lucide-react";
 
 export default function ContactForm() {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
+    phone: "",
     company: "",
     service: "",
     message: "",
-    botField: "" // honeypot field
+    botField: ""
   });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
 
@@ -29,7 +31,6 @@ export default function ContactForm() {
     setIsSubmitting(true);
     setSubmitStatus("idle");
 
-    // If honeypot is filled, likely a bot—ignore
     if (formData.botField) {
       console.warn("Bot detected!");
       setIsSubmitting(false);
@@ -43,19 +44,26 @@ export default function ContactForm() {
         body: JSON.stringify(formData),
       });
 
+      let result;
+      try {
+        result = await response.json();
+      } catch {
+        result = { message: "No response from server" };
+      }
+
       if (response.ok) {
         setSubmitStatus("success");
         setFormData({
           firstName: "",
           lastName: "",
           email: "",
+          phone: "",
           company: "",
           service: "",
           message: "",
           botField: ""
         });
       } else {
-        const result = await response.json();
         throw new Error(result.message || "Failed to send message");
       }
     } catch (err) {
@@ -65,6 +73,16 @@ export default function ContactForm() {
       setIsSubmitting(false);
     }
   };
+
+  const services = [
+    "QuickBooks Implementation",
+    "Xero Setup",
+    "Sage Accounting",
+    "Zoho Books",
+    "Data Migration",
+    "Staff Training",
+    "Other"
+  ];
 
   return (
     <Card className="max-w-4xl mx-auto mt-8">
@@ -87,7 +105,7 @@ export default function ContactForm() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Honeypot hidden field */}
+          {/* Honeypot */}
           <div style={{ display: "none" }}>
             <Label htmlFor="botField">Don't fill this out if you're human</Label>
             <Input
@@ -123,17 +141,36 @@ export default function ContactForm() {
             </div>
           </div>
 
-          <div>
-            <Label htmlFor="email">Email *</Label>
-            <Input
-              id="email"
-              name="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleInputChange("email", e.target.value)}
-              required
-              disabled={isSubmitting}
-            />
+          <div className="grid md:grid-cols-2 gap-4 items-end">
+            <div className="flex items-center space-x-2">
+              <Mail className="w-8 h-8 text-primary" />
+              <div className="flex-1">
+                <Label htmlFor="email">Email *</Label>
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  required
+                  disabled={isSubmitting}
+                />
+              </div>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Phone className="w-8 h-8 text-accent" />
+              <div className="flex-1">
+                <Label htmlFor="phone">Phone</Label>
+                <Input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => handleInputChange("phone", e.target.value)}
+                  disabled={isSubmitting}
+                />
+              </div>
+            </div>
           </div>
 
           <div>
@@ -159,13 +196,9 @@ export default function ContactForm() {
                 <SelectValue placeholder="Select a service" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="QuickBooks Implementation">QuickBooks Implementation</SelectItem>
-                <SelectItem value="Xero Setup">Xero Setup</SelectItem>
-                <SelectItem value="Sage Accounting">Sage Accounting</SelectItem>
-                <SelectItem value="Zoho Books">Zoho Books</SelectItem>
-                <SelectItem value="Data Migration">Data Migration</SelectItem>
-                <SelectItem value="Staff Training">Staff Training</SelectItem>
-                <SelectItem value="Other">Other</SelectItem>
+                {services.map((s) => (
+                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
