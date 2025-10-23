@@ -1,4 +1,7 @@
-import { useState } from "react";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -7,70 +10,52 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Loader2, CheckCircle, XCircle, Mail, Phone } from "lucide-react";
 
+// ✅ Schema definition
+const contactSchema = z.object({
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  email: z.string().email("Invalid email"),
+  phone: z.string().optional(),
+  company: z.string().optional(),
+  service: z.string().optional(),
+  message: z.string().min(1, "Message is required"),
+});
+
+type ContactFormData = z.infer<typeof contactSchema>;
+
 export default function ContactForm() {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    company: "",
-    service: "",
-    message: "",
-    botField: ""
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<ContactFormData>({
+    resolver: zodResolver(contactSchema),
   });
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
 
-  const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  const onSubmit = async (data: ContactFormData) => {
     setSubmitStatus("idle");
-
-    if (formData.botField) {
-      console.warn("Bot detected!");
-      setIsSubmitting(false);
-      return;
-    }
 
     try {
       const response = await fetch("/.netlify/functions/sendMail", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(data),
       });
 
-      let result;
-      try {
-        result = await response.json();
-      } catch {
-        result = { message: "No response from server" };
-      }
+      const result = await response.json();
 
       if (response.ok) {
         setSubmitStatus("success");
-        setFormData({
-          firstName: "",
-          lastName: "",
-          email: "",
-          phone: "",
-          company: "",
-          service: "",
-          message: "",
-          botField: ""
-        });
+        reset();
       } else {
         throw new Error(result.message || "Failed to send message");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       setSubmitStatus("error");
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
@@ -81,7 +66,7 @@ export default function ContactForm() {
     "Zoho Books",
     "Data Migration",
     "Staff Training",
-    "Other"
+    "Other",
   ];
 
   return (
@@ -104,40 +89,17 @@ export default function ContactForm() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Honeypot */}
-          <div style={{ display: "none" }}>
-            <Label htmlFor="botField">Don't fill this out if you're human</Label>
-            <Input
-              id="botField"
-              name="botField"
-              value={formData.botField}
-              onChange={(e) => handleInputChange("botField", e.target.value)}
-            />
-          </div>
-
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div className="grid md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="firstName">First Name *</Label>
-              <Input
-                id="firstName"
-                name="firstName"
-                value={formData.firstName}
-                onChange={(e) => handleInputChange("firstName", e.target.value)}
-                required
-                disabled={isSubmitting}
-              />
+              <Input id="firstName" {...register("firstName")} disabled={isSubmitting} />
+              {errors.firstName && <p className="text-sm text-red-600">{errors.firstName.message}</p>}
             </div>
             <div>
               <Label htmlFor="lastName">Last Name *</Label>
-              <Input
-                id="lastName"
-                name="lastName"
-                value={formData.lastName}
-                onChange={(e) => handleInputChange("lastName", e.target.value)}
-                required
-                disabled={isSubmitting}
-              />
+              <Input id="lastName" {...register("lastName")} disabled={isSubmitting} />
+              {errors.lastName && <p className="text-sm text-red-600">{errors.lastName.message}</p>}
             </div>
           </div>
 
@@ -146,50 +108,31 @@ export default function ContactForm() {
               <Mail className="w-8 h-8 text-primary" />
               <div className="flex-1">
                 <Label htmlFor="email">Email *</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange("email", e.target.value)}
-                  required
-                  disabled={isSubmitting}
-                />
+                <Input id="email" type="email" {...register("email")} disabled={isSubmitting} />
+                {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
               </div>
             </div>
             <div className="flex items-center space-x-2">
               <Phone className="w-8 h-8 text-accent" />
               <div className="flex-1">
                 <Label htmlFor="phone">Phone</Label>
-                <Input
-                  id="phone"
-                  name="phone"
-                  type="tel"
-                  value={formData.phone}
-                  onChange={(e) => handleInputChange("phone", e.target.value)}
-                  disabled={isSubmitting}
-                />
+                <Input id="phone" type="tel" {...register("phone")} disabled={isSubmitting} />
               </div>
             </div>
           </div>
 
           <div>
             <Label htmlFor="company">Company</Label>
-            <Input
-              id="company"
-              name="company"
-              value={formData.company}
-              onChange={(e) => handleInputChange("company", e.target.value)}
-              disabled={isSubmitting}
-            />
+            <Input id="company" {...register("company")} disabled={isSubmitting} />
           </div>
 
           <div>
             <Label htmlFor="service">Service Interest</Label>
             <Select
-              name="service"
-              value={formData.service}
-              onValueChange={(value) => handleInputChange("service", value)}
+              onValueChange={(value) => {
+                const event = { target: { name: "service", value } };
+                register("service").onChange(event);
+              }}
               disabled={isSubmitting}
             >
               <SelectTrigger>
@@ -197,26 +140,28 @@ export default function ContactForm() {
               </SelectTrigger>
               <SelectContent>
                 {services.map((s) => (
-                  <SelectItem key={s} value={s}>{s}</SelectItem>
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
           <div>
-            <Label htmlFor="message">Message</Label>
-            <Textarea
-              id="message"
-              name="message"
-              value={formData.message}
-              onChange={(e) => handleInputChange("message", e.target.value)}
-              rows={5}
-              disabled={isSubmitting}
-            />
+            <Label htmlFor="message">Message *</Label>
+            <Textarea id="message" rows={5} {...register("message")} disabled={isSubmitting} />
+            {errors.message && <p className="text-sm text-red-600">{errors.message.message}</p>}
           </div>
 
           <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? <><Loader2 className="animate-spin w-4 h-4 mr-2" /> Sending...</> : "Send Message"}
+            {isSubmitting ? (
+              <>
+                <Loader2 className="animate-spin w-4 h-4 mr-2" /> Sending...
+              </>
+            ) : (
+              "Send Message"
+            )}
           </Button>
         </form>
       </CardContent>

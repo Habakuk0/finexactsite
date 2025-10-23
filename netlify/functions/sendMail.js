@@ -1,6 +1,6 @@
-import nodemailer from "nodemailer";
+const nodemailer = require("nodemailer");
 
-export async function handler(event) {
+exports.handler = async function(event) {
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
@@ -11,7 +11,7 @@ export async function handler(event) {
   try {
     const data = JSON.parse(event.body);
 
-    // Ignore if honeypot is filled
+    // Honeypot check
     if (data.botField) {
       return {
         statusCode: 400,
@@ -25,8 +25,8 @@ export async function handler(event) {
       port: 465,
       secure: true,
       auth: {
-        user: process.env.ZOHO_EMAIL,         // your Zoho email
-        pass: process.env.ZOHO_APP_PASSWORD,  // app password
+        user: process.env.ZOHO_EMAIL,
+        pass: process.env.ZOHO_APP_PASSWORD,
       },
     });
 
@@ -58,10 +58,10 @@ Message: ${data.message}
       body: JSON.stringify({ message: "Message sent successfully!" }),
     };
   } catch (error) {
-    console.error(error);
+    console.error("SendMail error:", error);
     return {
       statusCode: 500,
-      body: JSON.stringify({ message: error?.message || "Internal Server Error" }),
+      body: JSON.stringify({ message: error.message || "Internal Server Error" }),
     };
   }
-}
+};
